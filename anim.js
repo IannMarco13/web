@@ -35,40 +35,32 @@ var lyricsData = [
   { text: "Contigo...", time: 223 },                          // 3:43 = 223 seg
   { text: "Contigo...", time: 228 },                          // 3:48 = 228 seg
 ];
-// Animar las letras
+// Animar las letras (versión optimizada)
 function updateLyrics() {
-  var time = Math.floor(audio.currentTime);
-  var currentLine = lyricsData.find(
-    (line) => time >= line.time && time < line.time + 6
+  var currentTime = audio.currentTime; // Usar currentTime sin redondear para precisión
+  var currentLine = lyricsData.find(line => 
+    currentTime >= line.time && currentTime < line.time + 5 // Mostrar cada línea por 5 seg
   );
 
   if (currentLine) {
-    // Calcula la opacidad basada en el tiempo en la línea actual
-    var fadeInDuration = 0.1; // Duración del efecto de aparición en segundos
-    var opacity = Math.min(1, (time - currentLine.time) / fadeInDuration);
-
-    // Aplica el efecto de aparición
+    var fadeInDuration = 1; // Duración del efecto de aparición (1 segundo)
+    var opacity = Math.min(1, (currentTime - currentLine.time) / fadeInDuration);
     lyrics.style.opacity = opacity;
-    lyrics.innerHTML = currentLine.text;
+    lyrics.textContent = currentLine.text;
   } else {
-    // Restablece la opacidad y el contenido si no hay una línea actual
     lyrics.style.opacity = 0;
-    lyrics.innerHTML = "";
+    lyrics.textContent = "";
   }
 }
 
-setInterval(updateLyrics, 1000);
+// Usar el evento 'timeupdate' para mayor precisión (mejor que setInterval)
+audio.addEventListener("timeupdate", updateLyrics);
 
-//funcion titulo
 // Función para ocultar el título después de 216 segundos
 function ocultarTitulo() {
   var titulo = document.querySelector(".titulo");
-  titulo.style.animation =
-    "fadeOut 3s ease-in-out forwards"; /* Duración y función de temporización de la desaparición */
-  setTimeout(function () {
-    titulo.style.display = "none";
-  }, 3000); // Espera 3 segundos antes de ocultar completamente
+  titulo.style.animation = "fadeOut 3s ease-in-out forwards";
+  setTimeout(() => titulo.style.display = "none", 3000);
 }
 
-// Llama a la función después de 216 segundos (216,000 milisegundos)
-setTimeout(ocultarTitulo, 216000);
+setTimeout(ocultarTitulo, 216000); // 216 segundos = 3 minutos y 36 segundos
